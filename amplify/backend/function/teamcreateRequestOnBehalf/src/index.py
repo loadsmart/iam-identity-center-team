@@ -18,6 +18,44 @@ ROLE_ID_PATTERN = re.compile(r'^arn:aws:sso:::permissionSet/ssoins-[a-zA-Z0-9-.]
 EMAIL_PATTERN = re.compile(r'^[^@]+@[^@]+\.[^@]+$')
 
 
+def get_sso_instance():
+    """Get Identity Store ID from SSO Admin"""
+    client = boto3.client('sso-admin')
+    response = client.list_instances()
+    return response['Instances'][0]
+
+
+def get_user_from_identity_center(identity_store_id, username):
+    """Look up user in Identity Center, return UserId or None"""
+    client = boto3.client('identitystore')
+    try:
+        response = client.get_user_id(
+            IdentityStoreId=identity_store_id,
+            AlternateIdentifier={
+                'UniqueAttribute': {
+                    'AttributePath': 'userName',
+                    'AttributeValue': username
+                }
+            }
+        )
+        return response['UserId']
+    except client.exceptions.ResourceNotFoundException:
+        return None
+
+
+def get_user_email(identity_store_id, user_id):
+    """Get primary email from Identity Center user"""
+    client = boto3.client('identitystore')
+    response = client.describe_user(
+        IdentityStoreId=identity_store_id,
+        UserId=user_id
+    )
+    for email in response.get('Emails', []):
+        if email.get('Primary', False) or email.get('Value'):
+            return email['Value']
+    return None
+
+
 def validate_input(input_data):
     """Validate input format (same rules as createRequests)"""
     errors = []
@@ -77,6 +115,27 @@ def handler(event, context):
     errors = validate_input(input_data)
     if errors:
         error_msg = f"Invalid input: {', '.join(errors)}"
+        print(f"Validation failed: {error_msg}")
+        raise Exception(error_msg)
+
+    # Validate user exists in Identity Center and email matches
+    sso_instance = get_sso_instance()
+    identity_store_id = sso_instance['IdentityStoreId']
+
+    user_id = get_user_from_identity_center(identity_store_id, input_data['username'])
+    if not user_id:
+        error_msg = f"User '{input_data['username']}' not found in Identity Center"
+        print(f"Validation failed: {error_msg}")
+        raise Exception(error_msg)
+
+    actual_email = get_user_email(identity_store_id, user_id)
+    if not actual_email:
+        error_msg = f"User '{input_data['username']}' has no email in Identity Center"
+        print(f"Validation failed: {error_msg}")
+        raise Exception(error_msg)
+
+    if actual_email.lower() != input_data['email'].lower():
+        error_msg = f"Email mismatch: provided '{input_data['email']}' does not match Identity Center"
         print(f"Validation failed: {error_msg}")
         raise Exception(error_msg)
 

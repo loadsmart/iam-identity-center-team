@@ -193,6 +193,21 @@
                   }
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sso-admin:ListInstances"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "identitystore:GetUserId",
+                "identitystore:DescribeUser"
+              ],
+              "Resource": "*"
             }
           ]
         }
