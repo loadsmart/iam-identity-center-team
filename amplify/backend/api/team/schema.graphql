@@ -112,6 +112,7 @@ type requests
     ]
   )
   session_duration: String
+  requestedBy: String
 }
 type sessions
   @model(subscriptions: { level: off })
