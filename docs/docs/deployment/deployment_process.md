@@ -132,7 +132,7 @@ If you want to use a GitHub repository instead of CodeCommit for source control,
 
 ### Prerequisites
 - AWS Console access with Amplify permissions
-- GitHub organization admin access (for `loadsmart` org)
+- GitHub organization admin access (for your organization)
 
 ### Steps
 
@@ -141,7 +141,7 @@ If you want to use a GitHub repository instead of CodeCommit for source control,
 3. Click **Connect repository**
 4. Select **GitHub** and click **Connect**
 5. Authorize the **AWS Amplify GitHub App** on your GitHub organization
-6. Select repository: `loadsmart/iam-identity-center-team`
+6. Select your fork/repository of the TEAM application
 7. Select branch: `main`
 8. Click **Save and deploy**
 
