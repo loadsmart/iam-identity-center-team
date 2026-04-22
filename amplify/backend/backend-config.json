@@ -289,6 +289,20 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "teamcreateRequestOnBehalf": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput"
+          ],
+          "category": "api",
+          "resourceName": "team"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "teamgetIdCGroups": {
       "build": true,
       "providerPlugin": "awscloudformation",
