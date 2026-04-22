@@ -1,3 +1,7 @@
+# © 2023 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.
+# This AWS Content is provided subject to the terms of the AWS Customer Agreement available at
+# http: // aws.amazon.com/agreement or other written agreement between Customer and either
+# Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 import os
 import json
 import uuid
@@ -50,6 +54,16 @@ def validate_input(input_data):
 
     if not input_data.get('startTime'):
         errors.append('Missing required field: startTime')
+
+    # Justification must start with alphanumeric if provided (same as VTL)
+    justification = input_data.get('justification', '')
+    if justification and not re.match(r'^[\w]', justification):
+        errors.append('justification must start with alphanumeric')
+
+    # ticketNo must start with alphanumeric if provided (same as VTL)
+    ticket_no = input_data.get('ticketNo', '')
+    if ticket_no and not re.match(r'^[A-Za-z0-9]', ticket_no):
+        errors.append('ticketNo must start with alphanumeric')
 
     return errors
 
