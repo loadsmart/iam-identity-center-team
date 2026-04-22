@@ -452,8 +452,12 @@ async def get_approvers_details(accountId):
                     approver_ids.append(data["approver_id"].lower())
     return {"approvers":approvers, "approver_ids":approver_ids}
 
-async def updateRequestDetails(request_id, username, accountId, roleId):
-    email = get_email(username)
+async def updateRequestDetails(request_id, username, accountId, roleId, existing_email=None):
+    # Use existing email if provided (machine auth), otherwise look up from Cognito (UI auth)
+    if existing_email:
+        email = existing_email
+    else:
+        email = get_email(username)
     approver_details = await get_approvers_details(accountId)
     approver_ids = approver_details["approver_ids"]
     approvers = approver_details["approvers"]
@@ -489,8 +493,9 @@ def request_is_updated(status,data,username,request_id):
     updated = False
     if status in ["error", "ended"]:
         return updated
-    elif status == "pending" and "email" not in data.keys():
-        asyncio.run(updateRequestDetails(request_id, username, data["accountId"]["S"], data["roleId"]["S"]))
+    elif status == "pending" and "approvers" not in data.keys():
+        existing_email = data.get("email", {}).get("S")
+        asyncio.run(updateRequestDetails(request_id, username, data["accountId"]["S"], data["roleId"]["S"], existing_email))
         print("updating request details")
     elif status in ["approved","rejected"] and "approver" not in data.keys():
         updateApproverDetails(request_id,data["approverId"]["S"])
