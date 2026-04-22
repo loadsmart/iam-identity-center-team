@@ -55,9 +55,6 @@ Update the parameters in the **parameters.sh** file as follows:
 - **TEAM_ADMIN_GROUP** - Name of IAM Identity Center group for TEAM administrators
 - **TEAM_AUDITOR_GROUP** - Name of IAM Identity Center group for TEAM auditors
 - **CLOUDTRAIL_AUDIT_LOGS** - ARN of organization CloudTrail Lake event datastore
-- **SECRET_NAME** - Name of the Secret stored in AWS Secret Manager
-> When using Github as the external repository ensure you use Tokens (classic) (https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#personal-access-tokens-classic) instead of Fine-grained tokens
-
 
 **Optional:**
 - **TAGS** - Tags that should be propagated to nested stacks and underlying resources
@@ -76,7 +73,6 @@ TEAM_AUDITOR_GROUP="team_auditor_group_name"
 TAGS="tag1=value1 tag2=value2"
 CLOUDTRAIL_AUDIT_LOGS=arn:aws:cloudtrail:us-east-1:123456789101:eventdatastore/e646f20d-7959-4682-be84-6c5b8a37cf15
 UI_DOMAIN=portal.teamtest.online
-SECRET_NAME=TEAM-IDC-APP
 ```
 
 ---
@@ -127,6 +123,38 @@ Once the deployment script has completed execution and the cloudformation stack 
 
 > It takes about 20 mins to complete the build and deployment of the Amplify application stack
 {: .note}
+
+---
+
+## Connect GitHub Repository (Optional)
+
+If you want to use a GitHub repository instead of CodeCommit for source control, connect it via the AWS Console after deployment:
+
+### Prerequisites
+- AWS Console access with Amplify permissions
+- GitHub organization admin access (for `loadsmart` org)
+
+### Steps
+
+1. Go to **AWS Amplify Console** → **All Apps** → **TEAM-IDC-APP**
+2. Click **Hosting environments** tab
+3. Click **Connect repository**
+4. Select **GitHub** and click **Connect**
+5. Authorize the **AWS Amplify GitHub App** on your GitHub organization
+6. Select repository: `loadsmart/iam-identity-center-team`
+7. Select branch: `main`
+8. Click **Save and deploy**
+
+> The Amplify GitHub App is managed by AWS and provides secure, token-free access to your repository. No personal access tokens required.
+{: .note}
+
+### Verify Connection
+
+After connecting, pushes to the configured branch will automatically trigger Amplify builds. Test by:
+
+1. Making a small change to the repository
+2. Pushing to the `main` branch
+3. Checking the Amplify Console for a new build
 
 ## Custom Domain Registration
 > This step is optional and required only if you have included a **UI_DOMAIN** parameter and intend to use a custom domain for your TEAM deployment instead of the default amplify generated domain name. 
