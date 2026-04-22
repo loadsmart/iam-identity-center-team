@@ -16,6 +16,9 @@
 /deployment/details.json
 /ignore
 
+# scripts credentials
+/scripts/.env
+
 # misc
 .DS_Store
 .env.local
@@ -59,3 +62,4 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+*.pyc
