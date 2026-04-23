@@ -27,7 +27,3 @@ stackName=`aws amplify get-backend-environment --region $REGION --app-id $appId 
 aws cloudformation delete-stack --region $REGION --stack-name $stackName
 
 aws cloudformation delete-stack --region $REGION --stack-name TEAM-IDC-APP
-
-if [ -z "$SECRET_NAME" ]; then
-  aws codecommit delete-repository --region $REGION \--repository-name team-idc-app
-fi
