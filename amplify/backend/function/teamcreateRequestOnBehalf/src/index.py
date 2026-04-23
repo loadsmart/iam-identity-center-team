@@ -44,15 +44,19 @@ def get_user_from_identity_center(identity_store_id, username):
 
 
 def get_user_email(identity_store_id, user_id):
-    """Get primary email from Identity Center user"""
+    """Get email from Identity Center user.
+    
+    Note: AWS Identity Center only supports 1 email per user.
+    See: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html
+    """
     client = boto3.client('identitystore')
     response = client.describe_user(
         IdentityStoreId=identity_store_id,
         UserId=user_id
     )
-    for email in response.get('Emails', []):
-        if email.get('Primary', False) or email.get('Value'):
-            return email['Value']
+    emails = response.get('Emails', [])
+    if emails and emails[0].get('Value'):
+        return emails[0]['Value']
     return None
 
 
@@ -82,7 +86,7 @@ def validate_input(input_data):
     if not role:
         errors.append('Missing required field: role')
     elif len(role) > 32 or not re.match(r'^[\w+=,.@-]+$', role):
-        errors.append('Invalid role format (max 32 chars, alphanumeric)')
+        errors.append('Invalid role format (max 32 chars, allowed: letters, digits, _ + = , . @ -)')
 
     account_name = input_data.get('accountName', '')
     if not account_name:
@@ -147,8 +151,15 @@ def handler(event, context):
     username = f"idc_{input_data['username']}"
 
     # Get machine client ID for audit (from Cognito token claims)
-    identity = event.get('identity', {})
-    requested_by = identity.get('sub') or identity.get('username') or 'unknown'
+    # For client-credentials tokens, client_id is in claims, not sub/username
+    identity = event.get('identity', {}) or {}
+    claims = identity.get('claims', {}) or {}
+    requested_by = (
+        claims.get('client_id')
+        or identity.get('sub')
+        or identity.get('username')
+        or 'unknown'
+    )
 
     # Build request item
     item = {
@@ -161,7 +172,7 @@ def handler(event, context):
         'roleId': input_data['roleId'],
         'startTime': input_data['startTime'],
         'duration': input_data['duration'],
-        'justification': input_data.get('justification', ''),
+        'justification': input_data.get('justification') or None,
         'ticketNo': input_data.get('ticketNo'),
         'session_duration': input_data.get('session_duration'),
         'status': 'pending',
