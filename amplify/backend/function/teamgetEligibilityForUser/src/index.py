@@ -3,8 +3,12 @@
 # http: // aws.amazon.com/agreement or other written agreement between Customer and either
 # Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 import os
+import re
 import boto3
 from botocore.exceptions import ClientError
+
+# Email format validation
+EMAIL_REGEX = re.compile(r'^[^@]+@[^@]+\.[^@]+$')
 
 dynamodb = boto3.resource('dynamodb')
 policy_table = dynamodb.Table(os.environ['POLICY_TABLE_NAME'])
@@ -49,8 +53,7 @@ def list_group_memberships(identity_store_id, user_id):
             for membership in page.get('GroupMemberships', []):
                 group_ids.append(membership['GroupId'])
         return group_ids
-    except ClientError as e:
-        print(f"Error listing group memberships: {e}")
+    except ClientError:
         return []
 
 
@@ -59,8 +62,7 @@ def get_entitlements(entity_id):
     try:
         response = policy_table.get_item(Key={'id': entity_id})
         return response.get('Item')
-    except ClientError as e:
-        print(f"Error getting entitlements for {entity_id}: {e}")
+    except ClientError:
         return None
 
 
@@ -77,8 +79,8 @@ def list_accounts_for_ou(ou_id):
                     'id': account['Id'],
                     'name': account['Name']
                 })
-    except ClientError as e:
-        print(f"Error listing accounts for OU {ou_id}: {e}")
+    except ClientError:
+        pass
     return accounts
 
 
@@ -133,6 +135,10 @@ def handler(event, context):
     if not email:
         raise Exception("Email is required")
 
+    # Validate email format
+    if not EMAIL_REGEX.match(email):
+        raise Exception("Invalid email format")
+
     # Get SSO instance
     sso_instance = get_sso_instance()
     identity_store_id = sso_instance['IdentityStoreId']
@@ -140,7 +146,8 @@ def handler(event, context):
     # Look up user by email
     user_id = get_user_by_email(identity_store_id, email)
     if not user_id:
-        raise Exception(f"User with email '{email}' not found in Identity Center")
+        # Generic error to prevent user enumeration
+        raise Exception("Unable to retrieve eligibility for this user")
 
     # Get user's group memberships
     group_ids = list_group_memberships(identity_store_id, user_id)
