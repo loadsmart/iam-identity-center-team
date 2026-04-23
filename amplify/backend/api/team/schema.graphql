@@ -112,6 +112,7 @@ type requests
     ]
   )
   session_duration: String
+  requestedBy: String
 }
 type sessions
   @model(subscriptions: { level: off })
@@ -295,6 +296,20 @@ input PermissionsInput {
   Duration: String
 }
 
+input CreateRequestOnBehalfInput {
+  username: String!
+  email: String!
+  accountId: String!
+  accountName: String!
+  role: String!
+  roleId: String!
+  startTime: AWSDateTime!
+  duration: String!
+  justification: String
+  ticketNo: String
+  session_duration: String
+}
+
 type Mutation {
   publishPolicy(result: PolicyInput): Policy
   @auth(rules: [{ allow: private, provider: iam} { allow: private }])
@@ -302,6 +317,9 @@ type Mutation {
   @auth(rules: [{ allow: private, provider: iam} { allow: private }])
   publishPermissions(result: PermissionInput): Permission
   @auth(rules: [{ allow: private, provider: iam} { allow: private }])
+  createRequestOnBehalf(input: CreateRequestOnBehalfInput!): requests
+  @function(name: "teamcreateRequestOnBehalf-${env}")
+  @auth(rules: [{ allow: groups, groupClaim: "scope", groups: ["api/admin"] }])
 }
 
 type Subscription {
