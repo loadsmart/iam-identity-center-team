@@ -135,7 +135,7 @@ def merge_eligibility(entitlements_list):
 
 def handler(event, context):
     """Get eligibility for a user by email"""
-    print(f"Received event: {event}")
+    print("Received getEligibilityForUser event")
 
     # Extract email from arguments
     email = event.get('arguments', {}).get('email')
@@ -158,7 +158,7 @@ def handler(event, context):
 
     # Get user's group memberships
     group_ids = list_group_memberships(identity_store_id, user_id)
-    print(f"User {email} is in groups: {group_ids}")
+    print(f"User {user_id} is in {len(group_ids)} group(s)")
 
     # Collect entitlements for user and all their groups
     entitlements = []
@@ -185,6 +185,6 @@ def handler(event, context):
 
     # Merge all entitlements
     result = merge_eligibility(entitlements)
-    print(f"Eligibility result: {result}")
+    print(f"Eligibility: {len(result.get('accounts', []))} accounts, {len(result.get('permissions', []))} permissions")
 
     return result
