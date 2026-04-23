@@ -18,7 +18,10 @@ def get_sso_instance():
     """Get SSO instance details"""
     client = boto3.client('sso-admin')
     response = client.list_instances()
-    return response['Instances'][0]
+    instances = response.get('Instances') or []
+    if not instances:
+        raise Exception("No IAM Identity Center instance found in this account/region")
+    return instances[0]
 
 
 def get_user_by_email(identity_store_id, email):
@@ -95,8 +98,12 @@ def merge_eligibility(entitlements_list):
         if not entitlement:
             continue
 
-        # Track max duration
-        duration = int(entitlement.get('duration', 0))
+        # Track max duration (defensive against None/non-numeric)
+        raw_duration = entitlement.get('duration') or 0
+        try:
+            duration = int(raw_duration)
+        except (TypeError, ValueError):
+            duration = 0
         if duration > max_duration:
             max_duration = duration
 
