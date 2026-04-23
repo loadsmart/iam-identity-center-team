@@ -354,7 +354,10 @@ type Query {
     @auth(rules: [{ allow: private }])
   getPermissions: Permission
     @function(name: "teamgetPermissions-${env}")
-    @auth(rules: [{ allow: private }])
+    @auth(rules: [
+      { allow: private },
+      { allow: groups, groupClaim: "scope", groups: ["api/admin"] }
+    ])
   getMgmtPermissions: MgmtPs
     @function(name: "teamgetMgmtAccountDetails-${env}")
     @auth(rules: [{ allow: private }])
