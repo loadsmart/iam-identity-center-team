@@ -393,5 +393,25 @@ type Query {
   validateRequest: requests
     @function(name: "teamvalidateRequest-${env}")
     @auth(rules: [{ allow: private }])
+  getEligibilityForUser(email: String!): EligibilityResult
+    @function(name: "teamgetEligibilityForUser-${env}")
+    @auth(rules: [{ allow: groups, groupClaim: "scope", groups: ["api/admin"] }])
+}
+
+type EligibilityResult {
+  accounts: [AccountOption!]!
+  permissions: [PermissionOption!]!
+  maxDuration: Int!
+  approvalRequired: Boolean!
+}
+
+type AccountOption {
+  id: String!
+  name: String!
+}
+
+type PermissionOption {
+  id: String!
+  name: String!
 }
 
