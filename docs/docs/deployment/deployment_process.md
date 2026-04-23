@@ -104,10 +104,7 @@ $ 123456789101 configured as delegated Admin for IAM Identity Center
 ---
 
 ## Run Deployment Script
-The **deploy.sh** bash script in the **deployment** folder performs the following actions within the **TEAM_ACCOUNT** :
-
-- Creates a CodeCommit repository and copies the TEAM application directory content to the repository.
-- Deploys a cloudformation template that creates an amplify hosted application and CI/CD pipeline for deploying the TEAM application.
+The **deploy.sh** bash script in the **deployment** folder deploys a CloudFormation template that creates an Amplify hosted application and CI/CD pipeline for deploying the TEAM application.
 
 > Ensure that the named profile for the **TEAM Deployment account** has sufficient permissions before executing the **deploy.sh** script
 {: .note}
@@ -126,9 +123,9 @@ Once the deployment script has completed execution and the cloudformation stack 
 
 ---
 
-## Connect GitHub Repository (Optional)
+## Connect GitHub Repository
 
-If you want to use a GitHub repository instead of CodeCommit for source control, connect it via the AWS Console after deployment:
+Connect your GitHub repository to Amplify via the AWS Console:
 
 ### Prerequisites
 - AWS Console access with Amplify permissions

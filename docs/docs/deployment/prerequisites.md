@@ -20,7 +20,7 @@ parent: Solution deployment
   {: .note}
 
 ### Permission set
-- Configure [Permission sets](https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html) in IAM Identity center.    
+- Configure [Permission sets](https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html) in IAM Identity center.
   > You can either use a predefined permission set provided by Identity Center, or you can create your own permission sets using custom permissions in order to provide least-privilege access for particular operational tasks.
    {: .note}
 
@@ -37,12 +37,6 @@ parent: Solution deployment
 TEAM uses AWS CloudTrail Lake for querying, auditing and logging API activities and actions performed by a user during the period of elevated access.
 Create a Cloudtrail Lake organization event datastore in the dedicated TEAM account that stores all log events for all AWS account in your organization
 
-## AWS Secrets Manager
-TEAM allows you to use external repositories for deploying the solution. 
-Create a secret in AWS Secret Manager containting your repository url and Access token in Secrets manager as shown below 
-
-![custom](../assets/images/secret-manager.png)
-
 ### TEAM groups
 - Create groups within AWS IAM Identity center for **TEAM admins** and **TEAM auditors**. These groups can be created locally (In Identity center) or synchronised from an external identity provider following your organisation's group membership review and attestation process.
 
@@ -50,7 +44,7 @@ Create a secret in AWS Secret Manager containting your repository url and Access
   {: .note}
 
 ## Development environment setup
-- Setup [awscli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and install [git-remote-codecommit](https://docs.aws.amazon.com/codecommit/latest/userguide/setting-up-git-remote-codecommit.html) on your local workstation
+- Setup [awscli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 - Install [jq](https://github.com/stedolan/jq/wiki/Installation) on your local workstation
 
@@ -58,7 +52,7 @@ Create a secret in AWS Secret Manager containting your repository url and Access
 
 - Setup a named profile for AWS CLI with sufficient permissions for the **AWS account where the TEAM Application will be deployed in**
 
-  You can use AWS CloudShell instead of the first two steps of setting up awscli, git-remote-codecommit, and jq on a local workstation.
+  You can use AWS CloudShell instead of setting up awscli and jq on a local workstation.
   {: .note}
 
 ### 🚀 You can now [Deploy the Application]({% link docs/deployment/deployment_process.md %}).
