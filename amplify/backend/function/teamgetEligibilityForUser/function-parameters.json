@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "apiteamGraphQLAPIIdOutput": "GetAtt:eligibilityTable:Name"
+  }
+}
